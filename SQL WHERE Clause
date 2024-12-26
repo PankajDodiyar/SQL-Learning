@@ -1,0 +1,17 @@
+The SQL WHERE Clause is used to filter records. It is used to extract only those records that fulfill a specified condition.
+
+Example :- Select all customers from Mexico:
+SELECT * FROM Customers WHERE Country='Mexico';
+
+Syntax
+SELECT column1, column2, ... FROM table_name WHERE condition;
+
+=	Equal	
+>	Greater than	
+<	Less than	
+>=	Greater than or equal	
+<=	Less than or equal	
+<>	Not equal. Note: In some versions of SQL this operator may be written as !=	
+BETWEEN	Between a certain range	
+LIKE	Search for a pattern	
+IN	To specify multiple possible values for a column
