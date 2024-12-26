@@ -1,0 +1,10 @@
+The SELECT statement is used to select data from a database.
+
+Syntax
+SELECT column1, column2, ... FROM table_name; (it will return specificied columns as output)
+
+SELECT * FROM Customers; (it will return all reccords from the table)
+
+" * " IS A WILDCARD  
+
+
