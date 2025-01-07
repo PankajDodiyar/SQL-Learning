@@ -29,3 +29,102 @@ pivot
 ) as pivottable
 
 update Sales set year = 2022 where salesman_id = 2
+
+select salesman_id,salesperson_name,[west],[north],[south],[east] from
+(
+select region,salesman_id,salesperson_name,total_sales,year as Y from Sales
+) as sourcetable
+Pivot
+(
+	sum(total_sales) for region in ([west],[north],[south],[east])
+)as pivottable
+
+
+
+
+-- Create the first table: Regions
+CREATE TABLE Regions (
+    region_id INT PRIMARY KEY,
+    region_name NVARCHAR(50)
+);
+
+-- Insert data into Regions
+INSERT INTO Regions (region_id, region_name) VALUES
+(1, 'North'),
+(2, 'South'),
+(3, 'East'),
+(4, 'West');
+
+-- Create the second table: Salespeople
+CREATE TABLE Salespeople (
+    salesman_id INT PRIMARY KEY,
+    salesperson_name NVARCHAR(100),
+    region_id INT,
+    FOREIGN KEY (region_id) REFERENCES Regions(region_id)
+);
+
+-- Insert data into Salespeople
+INSERT INTO Salespeople (salesman_id, salesperson_name, region_id) VALUES
+(1, 'John Doe', 1),
+(2, 'Jane Smith', 2),
+(3, 'Ali Khan', 3),
+(4, 'Maria Garcia', 4),
+(5, 'Chris Johnson', 1),
+(6, 'Emma Brown', 2),
+(7, 'Raj Patel', 3),
+(8, 'Sophia Lee', 4),
+(9, 'David Kim', 1),
+(10, 'Linda Wilson', 2);
+
+-- Create the third table: Sales
+CREATE TABLE Sales1 (
+    sale_id INT PRIMARY KEY,
+    salesman_id INT,
+    total_sales DECIMAL(10, 2),
+    sale_year INT,
+    FOREIGN KEY (salesman_id) REFERENCES Salespeople(salesman_id)
+);
+
+-- Insert data into Sales
+INSERT INTO Sales1 (sale_id, salesman_id, total_sales, sale_year) VALUES
+(1, 1, 25000.50, 2023),
+(2, 2, 32000.75, 2023),
+(3, 3, 28000.00, 2023),
+(4, 4, 31000.20, 2023),
+(5, 5, 27000.00, 2023),
+(6, 6, 35000.50, 2023),
+(7, 7, 33000.30, 2023),
+(8, 8, 30000.10, 2023),
+(9, 9, 26000.00, 2023),
+(10, 10, 34000.80, 2023);
+
+select * from Salespeople
+select * from Sales1 
+select * from Regions
+
+Create a pivot table to display total sales (total_sales) for each region (region_name)
+across different years (sale_year).
+
+select * from Sales1 
+select * from Salespeople
+select * from Regions
+
+select sale_year,[North],[South],[East],[West] from
+(
+select sum (s.total_sales) As Total,s.sale_year,r.region_name from Sales1 S 
+join Salespeople SP 
+on SP.salesman_id=S.salesman_id
+join Regions R
+on R.region_id=SP.region_id 
+group by region_name, sale_year
+) as sourcetable
+Pivot
+(	
+	sum(Total) for Region_name in ([North],[South],[East],[West])
+) as pivottable
+
+update Sales1 set sale_year = 2024 where salesman_id = 2
+
+
+
+
