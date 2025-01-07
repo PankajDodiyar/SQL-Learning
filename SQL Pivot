@@ -1,0 +1,31 @@
+CREATE TABLE Sales (
+    region NVARCHAR(50),
+    salesman_id INT PRIMARY KEY,
+    salesperson_name NVARCHAR(100),
+    total_sales DECIMAL(10, 2),
+    year INT
+);
+
+-- Insert 10 records
+INSERT INTO Sales (region, salesman_id, salesperson_name, total_sales, year) VALUES
+('North', 1, 'John Doe', 25000.50, 2023),
+('South', 2, 'Jane Smith', 32000.75, 2023),
+('East', 3, 'Ali Khan', 28000.00, 2023),
+('West', 4, 'Maria Garcia', 31000.20, 2023),
+('North', 5, 'Chris Johnson', 27000.00, 2023),
+('South', 6, 'Emma Brown', 35000.50, 2023),
+('East', 7, 'Raj Patel', 33000.30, 2023),
+('West', 8, 'Sophia Lee', 30000.10, 2023),
+('North', 9, 'David Kim', 26000.00, 2023),
+('South', 10, 'Linda Wilson', 34000.80, 2023);
+
+select salesman_id,salesperson_name,region, [2022],[2023] from 
+(
+select year as Y,salesman_id,salesperson_name,region,total_sales from Sales
+) as sourcetable
+pivot
+(
+	sum(total_sales) for Y in ([2022],[2023])
+) as pivottable
+
+update Sales set year = 2022 where salesman_id = 2
