@@ -1,0 +1,14 @@
+--Given a sales table with columns region, salesperson_id, salesperson_name, and total_sales, 
+----write SQL queries to rank salespeople within each region based on total_sales in descending order 
+----using the RANK(), DENSE_RANK(), and ROW_NUMBER() functions. What are the ranks 
+----for each salesperson in the East and West regions, and how do the rankings differ?
+
+select region,salesperson_name,total_sales, 
+ROW_NUMBER() over (partition by region order by total_sales ) as Row_Number from Sales 
+
+select region,salesperson_name,total_sales, 
+rank() over (partition by region order by total_sales ) as Rank from Sales 
+
+select region,salesperson_name,total_sales, 
+dense_rank() over (partition by region order by total_sales ) as Dense_rank from Sales
+
