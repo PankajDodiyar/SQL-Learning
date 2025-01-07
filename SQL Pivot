@@ -1,47 +1,3 @@
-CREATE TABLE Sales (
-    region NVARCHAR(50),
-    salesman_id INT PRIMARY KEY,
-    salesperson_name NVARCHAR(100),
-    total_sales DECIMAL(10, 2),
-    year INT
-);
-
--- Insert 10 records
-INSERT INTO Sales (region, salesman_id, salesperson_name, total_sales, year) VALUES
-('North', 1, 'John Doe', 25000.50, 2023),
-('South', 2, 'Jane Smith', 32000.75, 2023),
-('East', 3, 'Ali Khan', 28000.00, 2023),
-('West', 4, 'Maria Garcia', 31000.20, 2023),
-('North', 5, 'Chris Johnson', 27000.00, 2023),
-('South', 6, 'Emma Brown', 35000.50, 2023),
-('East', 7, 'Raj Patel', 33000.30, 2023),
-('West', 8, 'Sophia Lee', 30000.10, 2023),
-('North', 9, 'David Kim', 26000.00, 2023),
-('South', 10, 'Linda Wilson', 34000.80, 2023);
-
-select salesman_id,salesperson_name,region, [2022],[2023] from 
-(
-select year as Y,salesman_id,salesperson_name,region,total_sales from Sales
-) as sourcetable
-pivot
-(
-	sum(total_sales) for Y in ([2022],[2023])
-) as pivottable
-
-update Sales set year = 2022 where salesman_id = 2
-
-select salesman_id,salesperson_name,[west],[north],[south],[east] from
-(
-select region,salesman_id,salesperson_name,total_sales,year as Y from Sales
-) as sourcetable
-Pivot
-(
-	sum(total_sales) for region in ([west],[north],[south],[east])
-)as pivottable
-
-
-
-
 -- Create the first table: Regions
 CREATE TABLE Regions (
     region_id INT PRIMARY KEY,
@@ -98,12 +54,8 @@ INSERT INTO Sales1 (sale_id, salesman_id, total_sales, sale_year) VALUES
 (9, 9, 26000.00, 2023),
 (10, 10, 34000.80, 2023);
 
-select * from Salespeople
-select * from Sales1 
-select * from Regions
 
-Create a pivot table to display total sales (total_sales) for each region (region_name)
-across different years (sale_year).
+----Create a pivot table to display total sales (total_sales) for each region (region_name) across different years (sale_year).
 
 select * from Sales1 
 select * from Salespeople
@@ -111,20 +63,141 @@ select * from Regions
 
 select sale_year,[North],[South],[East],[West] from
 (
-select sum (s.total_sales) As Total,s.sale_year,r.region_name from Sales1 S 
-join Salespeople SP 
-on SP.salesman_id=S.salesman_id
-join Regions R
-on R.region_id=SP.region_id 
-group by region_name, sale_year
-) as sourcetable
+	select sum (s.total_sales) As Total,s.sale_year,r.region_name from Sales1 S 
+	join Salespeople SP 
+	on SP.salesman_id=S.salesman_id
+	join Regions R
+	on R.region_id=SP.region_id 
+	group by region_name, sale_year
+)as sourcetable
+
 Pivot
+
 (	
 	sum(Total) for Region_name in ([North],[South],[East],[West])
-) as pivottable
+)as pivottable
 
 update Sales1 set sale_year = 2024 where salesman_id = 2
 
+--Unpivot above Table
+
+select sale_year,region_name,total from
+(
+	select sum (s.total_sales) As Total,s.sale_year,r.region_name from Sales1 S 
+	join Salespeople SP 
+	on SP.salesman_id=S.salesman_id
+	join Regions R
+	on R.region_id=SP.region_id 
+	group by region_name, sale_year
+)as sourcetable
+
+Pivot
+
+(	
+	sum(Total) for Region_name in ([North],[South],[East],[West])
+)as pivottable
+
+UNPIVOT
+
+(
+	total for region_name in ([North],[South],[East],[West])
+
+)as unpivottable
 
 
+----/*Salesperson Performance by Region
+----Create a pivot table to show the total sales (total_sales) for 
+--each salesperson (salesperson_name) categorized by region (region_name).
+
+
+select * from Sales1 
+select * from Salespeople
+select * from Regions
+
+select salesperson_name, [North],[South],[East],[West] from 
+(
+	select Sp.salesman_id ,total_sales,region_name,salesperson_name from Sales1 S 
+	join Salespeople SP 
+	on S.salesman_id=SP.salesman_id 
+	join Regions R
+	on SP.region_id=R.region_id
+)as sourcetable
+
+Pivot
+
+(
+	sum(total_sales) for region_name in ([North],[South],[East],[West])
+)as pivottable
+
+--Unpivot above table 
+
+select  salesperson_name,total_sales,region_name from 
+(
+	select Sp.salesman_id ,total_sales,region_name,salesperson_name from Sales1 S 
+	join Salespeople SP 
+	on S.salesman_id=SP.salesman_id 
+	join Regions R
+	on SP.region_id=R.region_id
+)as sourcetable
+
+Pivot
+
+(
+	sum(total_sales) for region_name in ([North],[South],[East],[West])
+)as pivottable
+
+unpivot
+
+(
+	total_sales for region_name in ([North],[South],[East],[West])
+)as unpivottable
+
+
+
+/*Highest Sales in Each Region
+Use a pivot table to find the salesperson (salesperson_name) 
+with the highest total sales (total_sales) in each region (region_name).*/
+
+
+select * from Sales1 
+select * from Salespeople
+select * from Regions
+
+Select salesperson_name, [North],[South],[East],[West] from 
+(
+	Select total_sales,region_name,salesperson_name from Sales1 S
+	join Salespeople SP
+	on S.salesman_id=SP.salesman_id
+	join Regions R 
+	on R.region_id=SP.region_id
+)as sourcetable
+
+Pivot
+
+(
+	max(total_sales) for region_name in ([North],[South],[East],[West])
+)as Pivottable
+
+--Unpivot Above table 
+
+Select salesperson_name,region_name,total_sales from 
+(
+	Select total_sales,region_name,salesperson_name from Sales1 S
+	join Salespeople SP
+	on S.salesman_id=SP.salesman_id
+	join Regions R 
+	on R.region_id=SP.region_id
+)as sourcetable
+
+Pivot
+
+(
+	max(total_sales) for region_name in ([North],[South],[East],[West])
+)as Pivottable
+
+unpivot
+
+(
+	total_sales for region_name in ([North],[South],[East],[West])
+)as Unpivottable
 
