@@ -109,4 +109,14 @@ WHERE P.PatientID NOT IN (SELECT PatientID FROM Payments)
 GROUP BY P.PatientID,P.PatientName
 
 
+--List all patients along with their total payment amount. Include patients who haven't made any payments yet.
 
+SELECT * FROM Patients
+SELECT * FROM Payments
+SELECT * FROM Enquiries
+SELECT * FROM Treatments
+
+SELECT SUM(PA.PaymentAmount) [PAYMENT MADE], P.PatientName FROM Patients P
+LEFT JOIN Payments PA
+ON P.PatientID=PA.PatientID 
+GROUP BY PA.PatientID,P.PatientName
