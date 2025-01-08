@@ -101,10 +101,10 @@ SELECT MAX(E.EnquiryDate)[Latest enquiry date],
        COUNT(T.TreatmentID) AS TotalTreatmentCount,
        MAX(T.TreatmentDate) AS LastTreatmentDate, 
 	   P.PatientID,P.PatientName 
-FROM Enquiries E 
-LEFT JOIN Patients P ON E.PatientID=P.PatientID
+FROM Patients P
+LEFT JOIN Enquiries E ON P.PatientID=E.PatientID
+LEFT JOIN Treatments T ON E.PatientID=T.PatientID
 LEFT JOIN Payments PA ON P.PatientID=PA.PatientID
-LEFT JOIN Treatments T ON PA.PatientID=T.PatientID
 WHERE P.PatientID NOT IN (SELECT PatientID FROM Payments)
 GROUP BY P.PatientID,P.PatientName
 
