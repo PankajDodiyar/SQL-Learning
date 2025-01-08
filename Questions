@@ -1,0 +1,112 @@
+--write a sql query to find sales people who had more than one customer. return salesman_id and name.
+
+select * from customers
+select * from Orders
+select * from salesman
+
+select SM.salesman_id as Salesman_ID,SM.name as Sales_Person_Name from customers C
+join salesman SM 
+on C.salesman_id=SM.salesman_id 
+group by SM.salesman_id,SM.name
+having count(C.customer_id) > 1
+
+--from the following tables, write a sql query to find those salespeople who earned the maximum commission return o.ord_no, o.purch_amt, o.ord_date, s.name, salesman id
+
+select O.ord_no, O.purch_amt, O.ord_date, SM.name, SM.salesman_id, SM.commission from Orders O
+join salesman SM 
+ON O.salesman_id=SM.salesman_id 
+WHERE commission = (SELECT MAX(COMMISSION) FROM Salesman)
+
+
+-- Create the Patients table
+CREATE TABLE Patients (
+    PatientID INT PRIMARY KEY,
+    PatientName VARCHAR(100)
+);
+
+-- Create the Payments table
+CREATE TABLE Payments (
+    PaymentID INT PRIMARY KEY,
+    PatientID INT,
+    PaymentAmount DECIMAL(10, 2),
+    PaymentDate DATE,
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
+);
+
+-- Create the Enquiries table
+CREATE TABLE Enquiries (
+    EnquiryID INT PRIMARY KEY,
+    PatientID INT,
+    EnquiryDate DATE,
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
+);
+
+-- Create the Treatments table
+CREATE TABLE Treatments (
+    TreatmentID INT PRIMARY KEY,
+    PatientID INT,
+    TreatmentDate DATE,
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
+);
+
+-- Insert data into Patients
+INSERT INTO Patients (PatientID, PatientName) VALUES
+(1, 'John Doe'),
+(2, 'Jane Smith'),
+(3, 'Alice Johnson'),
+(4, 'Bob Brown'),
+(5, 'Mary White');
+
+-- Insert data into Payments
+INSERT INTO Payments (PaymentID, PatientID, PaymentAmount, PaymentDate) VALUES
+(1, 1, 500.00, '2025-01-01'),
+(2, 2, 300.00, '2025-01-03');
+
+-- Insert data into Enquiries
+INSERT INTO Enquiries (EnquiryID, PatientID, EnquiryDate) VALUES
+(1, 1, '2024-12-15'),
+(2, 2, '2024-12-18'),
+(3, 3, '2024-12-20'),
+(4, 4, '2024-12-22'),
+(5, 5, '2024-12-25');
+
+-- Insert data into Treatments
+INSERT INTO Treatments (TreatmentID, PatientID, TreatmentDate) VALUES
+(1, 1, '2025-01-05'),
+(2, 3, '2025-01-07'),
+(3, 3, '2025-01-08'),
+(4, 4, '2025-01-09');
+
+--Retrieves a list of patients who have converted through an enquiry but have not made any payments. 
+--And For each patient, include their latest enquiry date, the total number of treatments received, 
+--and the date of their last treatment. 
+--Ensure that the query returns the following columns: : 
+--PatientID, PatientName, LatestEnquiryDate, TotalTreatmentCount, and LastTreatmentDate
+
+SELECT * FROM Patients
+SELECT * FROM Payments
+SELECT * FROM Enquiries
+SELECT * FROM Treatments
+
+SELECT * FROM Enquiries E 
+JOIN Patients P
+ON E.PatientID=P.PatientID
+WHERE EnquiryID NOT IN ( SELECT * FROM PAY
+JOIN Treatments T
+ON P.PatientID=T.PatientID
+JOIN Payments PM
+ON T.PatientID=PM.PatientID
+
+SELECT MAX(E.EnquiryDate)[Latest enquiry date], 
+       COUNT(T.TreatmentID) AS TotalTreatmentCount,
+       MAX(T.TreatmentDate) AS LastTreatmentDate, 
+	   P.PatientID,P.PatientName 
+FROM Enquiries E 
+LEFT JOIN Patients P ON E.PatientID=P.PatientID
+LEFT JOIN Payments PA ON P.PatientID=PA.PatientID
+LEFT JOIN Treatments T ON PA.PatientID=T.PatientID
+WHERE P.PatientID NOT IN (SELECT PatientID FROM Payments)
+GROUP BY P.PatientID,P.PatientName
+
+
+
